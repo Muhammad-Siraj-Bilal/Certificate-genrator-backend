@@ -1,10 +1,15 @@
 import cv2
 from PIL import ImageFont, ImageDraw, Image  
 import numpy as np 
+#import crud, tables
+#rom schema import MemberSchema
+#from connect_to_db import Base, engine
+
+#user = crud.get_user(email, db)
 
 #inputs
-name = 'Anushka Narsima Amarnath'     #Gotta take name from database, using given email
-track = 'Deep Learning'               #Input from webpage
+#name = f"{user.fullName}"     #Gotta take name from database, using given email
+#track = f"{user.track}"            #Input from webpage
 
 # Three other files must be in the directory:
 # 1 - the image of the certificate template, 'cert_template.png'
@@ -51,5 +56,5 @@ def generate_cert(name, track):
     return cv2.cvtColor(np.array(template), cv2.COLOR_RGB2BGR)   #Converting back to RGB
 
 #Calling & saving
-template = generate_cert(name, track)
-cv2.imwrite('new/cert_m.png', template)
+#template = generate_cert(name, track)
+#cv2.imwrite('new/cert_m.png', template)
