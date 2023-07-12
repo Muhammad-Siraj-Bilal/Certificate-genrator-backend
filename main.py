@@ -3,6 +3,7 @@ from connect_to_db import Base, engine
 import crud, tables
 from fastapi.responses import FileResponse
 from schema import MemberSchema
+from cert_generator import *
 
 app = FastAPI()
 
@@ -22,7 +23,10 @@ def validate(email:str = Body(), track:str = Body(), db=Depends(crud.get_db)):
 @app.get("/api/get_certificate/{email}")
 def certificate(email:str, db=Depends(crud.get_db)):
     user = crud.get_user(email, db)
-    with open(f"{user.fullName}.txt", 'w') as file:
-        file.write(user.fullName)
-    return FileResponse(path = f"{user.fullName}.txt", media_type="text/plain", filename=f"{user.fullName}.txt")
 
+    #with open(f"{user.fullName}.txt", 'w') as file:
+        #file.write(user.fullName)
+    #return FileResponse(path = f"{user.fullName}.txt", media_type="text/plain", filename=f"{user.fullName}.txt")
+
+    template = generate_cert(user.fullName, user.track)
+    cv2.imwrite('new/cert_m.png', template)
