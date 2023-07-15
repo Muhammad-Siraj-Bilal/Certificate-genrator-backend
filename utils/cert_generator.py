@@ -1,6 +1,12 @@
 import cv2
 from PIL import ImageFont, ImageDraw, Image  
 import numpy as np 
+import urllib.request
+import io
+
+url = 'http://localhost:8000/resources/'  # Replace with the URL of the image you want to read
+
+
 #import crud, tables
 #rom schema import MemberSchema
 #from connect_to_db import Base, engine
@@ -33,15 +39,27 @@ def generate_cert(name, track):
     line_3 = 'hard work, and commitment have led you to achieve this significant'
     line_4 = 'milestone.  Congratulations on your accomplishment!'
 
-    #now the image
-    template = cv2.imread('cert_template.png')           #Loading the img
+    req = urllib.request.urlopen(url+'cert_template.png')
+    arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+    template = cv2.imdecode(arr, -1)
+    if not template.any(): 
+        return 
     template = cv2.cvtColor(template,cv2.COLOR_BGR2RGB)  #OpenCV uses BGR so converting to RGB
     template = Image.fromarray(template)                 #Sending to PIL
     draw = ImageDraw.Draw(template)
 
     #Loading fonts
-    font1 = ImageFont.truetype('NotoSans-CondensedSemiBold.ttf', 100)  
-    font2 = ImageFont.truetype('NotoSans-Italic.ttf', 40)  
+    font_one = urllib.request.urlopen(url+"NotoSans-CondensedSemiBold.ttf").read()
+    font_two = urllib.request.urlopen(url+"NotoSans-Italic.ttf").read()
+
+    font_one_path = io.BytesIO(font_one)
+    font_two_path = io.BytesIO(font_two)
+
+
+    # Load the font from the downloaded file
+
+    font1 = ImageFont.truetype(font_one_path, 100)  
+    font2 = ImageFont.truetype(font_two_path, 40)  
 
     #Putting text into img
     h = 150
@@ -56,5 +74,5 @@ def generate_cert(name, track):
     return cv2.cvtColor(np.array(template), cv2.COLOR_RGB2BGR)   #Converting back to RGB
 
 #Calling & saving
-#template = generate_cert(name, track)
-#cv2.imwrite('new/cert_m.png', template)
+# template = generate_cert("Sydney Idundun", "Backend")
+# cv2.imwrite('new/cert_m.png', template)

@@ -1,4 +1,4 @@
-from connect_to_db import Base
+from utils.connect_to_db import Base
 from sqlalchemy import Column, String, Integer, Boolean
 
 

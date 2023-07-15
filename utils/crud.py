@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from connect_to_db import localSession
-import tables
+from utils.connect_to_db import localSession
+import tables.tables as tables
 
 def get_db()-> Session:
     session: Session = localSession()
@@ -30,8 +30,7 @@ def validate(email: str, track: str, db: Session):
         return True
     return False
 
-def certificate(email: str, track: str, db: Session):
-    user = get_user(email, db)
+def certify(user: tables.Member):
     if user:
         return user.completed
     return False

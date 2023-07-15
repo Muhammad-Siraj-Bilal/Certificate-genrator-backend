@@ -8,5 +8,8 @@ fastapi = {version = "*", extras = ["all"]}
 sqlalchemy = "*"
 psycopg2 = "*"
 python-decouple = "*"
+pillow = "*"
+numpy = "*"
+opencv-python = "*"
 
 [dev-packages]
