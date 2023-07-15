@@ -64,8 +64,13 @@ def generate_cert(name, track):
     #Putting text into img
     h = 150
     w = 420
-    draw.text((h, w), name[0].upper(), font=font1, fill='#646464')  
-    draw.text((h, w+120), name[1].upper(), font=font1, fill='#646464')  
+
+    if type(name) == list:
+        draw.text((h, w), name[0].upper(), font=font1, fill='#646464')  
+        draw.text((h, w+120), name[1].upper(), font=font1, fill='#646464')  
+    else:
+        draw.text((h, w+50), name.upper(), font=font1, fill='#646464')
+ 
     draw.text((h, w+120+160), line_1, font=font2, fill='#646464')  
     draw.text((h, w+120+160+70), line_2, font=font2, fill='#646464') 
     draw.text((h, w+120+160+70+70), line_3, font=font2, fill='#646464')  

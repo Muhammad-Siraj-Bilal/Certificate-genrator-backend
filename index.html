@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="holder"></div>
+    <button onclick="getImage()">Download</button>
+  </body>
+
+  <script>
+    async function getImage() {
+      let result = await fetch(
+        "http://127.0.0.1:8000/api/get_certificate/sydney@example.com"
+      );
+      let response = result.json();
+
+      console.log(response);
+
+      let image = document.createElement("img");
+      image.src = response;
+
+      const holder = document.getElementById("holder");
+      holder.appendChild(holder);
+    }
+  </script>
+</html>

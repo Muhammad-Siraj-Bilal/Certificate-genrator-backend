@@ -5,11 +5,23 @@ from fastapi.responses import FileResponse
 from schema.schema import MemberSchema
 from utils.cert_generator import *
 from fastapi.staticfiles import StaticFiles
-import os
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 
 app = FastAPI()
 app.mount("/resources", StaticFiles(directory="resources"))
 
+origins = ["http://localhost","http://localhost:5500", "http://127.0.0.1:5500"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 Base.metadata.create_all(bind=engine)
 
 @app.post("/users")
@@ -40,14 +52,9 @@ def getCertificate(email:str, db=Depends(crud.get_db)):
     hasCertificate: bool = crud.certify(user)
     if hasCertificate:
         template = generate_cert(user.fullName, user.track)
-        # if not template.any():
-        print("working")
         filePath = f'{user.fullName}.png'
         cv2.imwrite(filePath, template)
-        response = FileResponse(filePath)
-
-        # delete file 
-        # os.remove(filePath)
+        response = FileResponse(filePath, filename=filePath, media_type="image/png")
         return response
 
     return {"status":"User has not been assigned a certificate"}

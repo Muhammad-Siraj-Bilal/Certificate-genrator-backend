@@ -5,7 +5,7 @@ class MemberSchema(BaseModel):
     fullName: str 
     track: str 
     completed: bool = True
-    password: str
+    password: str | None = None
     is_mentor: bool = True
 
     class Config:
