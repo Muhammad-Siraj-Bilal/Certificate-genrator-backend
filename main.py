@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Body
+from fastapi import FastAPI, Depends, Body, HTTPException, status
 from utils.connect_to_db import Base, engine
 import utils.crud as crud, tables.tables as tables
 from fastapi.responses import FileResponse
@@ -9,8 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 
-
-app = FastAPI()
+TITLE = "Middlesex Computing Society Backend"
+DESCRIPTION = "Backend system for MCS"
+app = FastAPI(title= TITLE, description=DESCRIPTION)
 app.mount("/resources", StaticFiles(directory="resources"))
 
 origins = ["http://localhost","http://localhost:5500", "http://127.0.0.1:5500"]
@@ -24,27 +25,42 @@ app.add_middleware(
 )
 Base.metadata.create_all(bind=engine)
 
-@app.post("/users")
+@app.post("/users", summary="Creates a new member account", description="Takes in a MemberSchema object which takes all the fields required to create a new user")
 def createUser(member: MemberSchema, db=Depends(crud.get_db)):
-
-    # this function takes in the member info data and 
-    # creates a tables Member object of a user 
     new_user = tables.Member(**member.model_dump())
-
-    # commits this new user to the database
     new_user = crud.createMember(new_user, db)
-    return new_user
+    if new_user:
+        new_user.password = None
+        return new_user
+    return HTTPException(status_code=status.HTTP_409_CONFLICT)
 
-@app.post("/api/validate")
+@app.post("/certify/{email}", summary="This endpoint will certify that a user has completed the study group program")
+def certifyUser(email:str, db= Depends(crud.get_db)):
+    user = crud.get_user(email, db)
+    user = crud.update(user, db, True)
+    return user
+
+@app.get("/users", summary="This endpoint gets all the Users, their is a query parameter track which could filter down the search")
+def getUsers(track: str | None = None, db = Depends(crud.get_db)):
+    result = crud.getMembers(db, track)
+    if result:
+        return result
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@app.delete("/delete/{email}", summary="This endpoint will delete the member with the specified email from the database")
+def deleteUser(email: str, db = Depends(crud.get_db)):
+    user = crud.get_user(email, db)
+    crud.deleteMember(user, db)
+    return {"status":"Member has been deleted"}
+
+@app.post("/api/validate", tags=["Certificate"], summary="Validates if a user has been assigned a certificate")
 def validate(email:str = Body(), track:str = Body(), db=Depends(crud.get_db)):
-
-    # checks if the user exists in the database and
-    # if the user is eligible to get a certificate 
     user = crud.get_user(email, db)
     result = crud.certify(user)
     return result
 
-@app.get("/api/get_certificate/{email}")
+@app.get("/api/get_certificate/{email}", tags=["Certificate"], summary="Downloads the certificate for a certified user")
 def getCertificate(email:str, db=Depends(crud.get_db)):
     user = crud.get_user(email, db)
 
